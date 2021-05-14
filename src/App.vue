@@ -230,6 +230,7 @@ export default {
         dateend = this.range[1]
         dateend =  dateend +" "+ this.end
       }
+      
       let res = await cfdiservices.getcfdireporissues(
         companygroup,
         company,
