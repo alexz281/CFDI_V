@@ -1,0 +1,29 @@
+<section class="v-advanced-edit-dialog">
+  <v-dialog
+    ref="menu"
+    v-model="showDialog"
+    v-bind="props"
+    :return-value.sync="originalReturnValue"
+    @update:return-value="updateReturnValue($event)">
+    <v-card>
+      <v-card-title>{{ title }}</v-card-title>
+      <v-card-text>
+        <slot v-if="!canceled"></slot>
+      </v-card-text>
+      <v-divider></v-divider>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text color="primary" @click="cancel()">Cancelar</v-btn>
+        <v-btn text color="primary" :disabled="originalReturnValue === undefined" @click="save()">Aceptar</v-btn>
+      </v-card-actions>
+    </v-card>
+
+    <template v-if="hasActivatorSlot || activatorProp === undefined" #activator="scope">
+      <slot v-if="hasActivatorSlot" name="activator" v-bind="scope"></slot>
+      <v-btn v-else v-bind="scope.attrs" v-on="scope.on">
+        <v-icon v-if="defaultActivatorButtonIcon !== undefined" left>{{ defaultActivatorButtonIcon }}</v-icon>
+        {{ defaultActivatorButtonText }}
+      </v-btn>
+    </template>
+  </v-dialog>
+</section>
