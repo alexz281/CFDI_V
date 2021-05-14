@@ -222,8 +222,6 @@ export default {
       if(this.daterange == '' || this.daterange == null || this.daterange == false){
         this.datestart = null
         this.end = null
-        //this.datestart = today.getFullYear + "-01-01 00:00:000"
-        //this.end = today.getFullYear + "-" + today.getMonth + "-" + today.getDay + " " +"00:00:000"
       } else{
         this.start = "00:00:00"
         datestart = this.range[0] 
