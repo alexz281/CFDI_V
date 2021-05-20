@@ -78,7 +78,9 @@ export default {
         };
     },
     computed: {},
-    created() {},
+    created() {
+        console.log(this.headers,333)
+    },
     methods: {
         emit(name, payload) {
             this.$emit(name, payload);

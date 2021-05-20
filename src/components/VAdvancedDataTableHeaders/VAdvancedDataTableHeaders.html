@@ -1,7 +1,7 @@
 <section class="v-advanced-data-table-headers">
-  <v-list >
+  <v-list>
     <draggable v-model="headers" @end="emitInput()">
-      <v-card v-for="(header, index) in headers">
+      <v-card v-for="(header, index) in headers" :key="index">
         <v-divider v-if="index > 0"></v-divider>
         <v-card-text>
           <v-list-item @change="emitInput()">
@@ -14,12 +14,8 @@
               </v-tooltip>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-text-field 
-                v-if="editingHeader === header"
-                v-model="header.text"
-                prepend-icon="mdi-check"
-                @click:prepend="editHeaderText(header)"
-                @keyup.enter="editHeaderText(header)">
+              <v-text-field v-if="editingHeader === header" v-model="header.text" prepend-icon="mdi-check"
+                @click:prepend="editHeaderText(header)" @keyup.enter="editHeaderText(header)">
               </v-text-field>
               <v-list-item-title v-else>
                 <v-tooltip bottom>
@@ -36,7 +32,8 @@
             <v-list-item-action>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn v-bind="attrs" icon :disabled="header.hideable !== undefined && !header.hideable" v-on="on" @click="toogleHeaderVisibility(header)">
+                  <v-btn v-bind="attrs" icon :disabled="header.hideable !== undefined && !header.hideable" v-on="on"
+                    @click="toogleHeaderVisibility(header)">
                     <v-icon v-if="(header.hideable === undefined || header.hideable) && header.hidden">mdi-eye</v-icon>
                     <v-icon v-else>mdi-eye-off</v-icon>
                   </v-btn>
@@ -58,7 +55,8 @@
             <v-list-item-action>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
-                  <v-btn v-bind="attrs" icon :disabled="index === headers.length - 1" v-on="on" @click="moveHeaderDown(index)">
+                  <v-btn v-bind="attrs" icon :disabled="index === headers.length - 1" v-on="on"
+                    @click="moveHeaderDown(index)">
                     <v-icon>mdi-arrow-down-bold</v-icon>
                   </v-btn>
                 </template>
