@@ -1,0 +1,86 @@
+<section class="v-advanced-data-table-headers">
+  <v-list >
+    <draggable v-model="headers" @end="emitInput()">
+      <v-card v-for="(header, index) in headers">
+        <v-divider v-if="index > 0"></v-divider>
+        <v-card-text>
+          <v-list-item @change="emitInput()">
+            <v-list-item-icon>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon v-bind="attrs" large v-on="on">mdi-drag-vertical</v-icon>
+                </template>
+                Arrastra para mover el campo
+              </v-tooltip>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-text-field 
+                v-if="editingHeader === header"
+                v-model="header.text"
+                prepend-icon="mdi-check"
+                @click:prepend="editHeaderText(header)"
+                @keyup.enter="editHeaderText(header)">
+              </v-text-field>
+              <v-list-item-title v-else>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn v-bind="attrs" icon v-on="on" @click=editHeaderText(header)>
+                      <v-icon>mdi-pencil</v-icon>
+                    </v-btn>
+                  </template>
+                  Cambiar el nombre del campo
+                </v-tooltip>
+                {{ header.text }}
+              </v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn v-bind="attrs" icon :disabled="header.hideable !== undefined && !header.hideable" v-on="on" @click="toogleHeaderVisibility(header)">
+                    <v-icon v-if="(header.hideable === undefined || header.hideable) && header.hidden">mdi-eye</v-icon>
+                    <v-icon v-else>mdi-eye-off</v-icon>
+                  </v-btn>
+                </template>
+                <span v-if="header.hidden">Mostrar</span>
+                <span v-else>Ocultar</span>
+              </v-tooltip>
+            </v-list-item-action>
+            <v-list-item-action>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn v-bind="attrs" icon :disabled="index === 0" v-on="on" @click="moveHeaderUp(index)">
+                    <v-icon>mdi-arrow-up-bold</v-icon>
+                  </v-btn>
+                </template>
+                Mover hacia arriba
+              </v-tooltip>
+            </v-list-item-action>
+            <v-list-item-action>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn v-bind="attrs" icon :disabled="index === headers.length - 1" v-on="on" @click="moveHeaderDown(index)">
+                    <v-icon>mdi-arrow-down-bold</v-icon>
+                  </v-btn>
+                </template>
+                Mover hacia abajo
+              </v-tooltip>
+            </v-list-item-action>
+            <v-list-item-action>
+              <v-btn-toggle v-model="header.align" shaped mandatory>
+                <v-btn value="start">
+                  <v-icon>mdi-format-align-left</v-icon>
+                </v-btn>
+                <v-btn value="center">
+                  <v-icon>mdi-format-align-center</v-icon>
+                </v-btn>
+                <v-btn value="end">
+                  <v-icon>mdi-format-align-right</v-icon>
+                </v-btn>
+              </v-btn-toggle>
+            </v-list-item-action>
+          </v-list-item>
+        </v-card-text>
+      </v-card>
+    </draggable>
+  </v-list>
+</section>

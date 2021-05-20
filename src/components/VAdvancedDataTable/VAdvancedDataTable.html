@@ -1,0 +1,41 @@
+<section class="v-advanced-data-table">
+    <v-card flat>
+        <v-card-title>
+            <span>{{ title }}</span>
+            <v-spacer></v-spacer>
+            <slot name="title.append"></slot>
+        </v-card-title>
+        <v-card-actions>
+            <slot name="actions"></slot>
+            <v-spacer></v-spacer>
+            <v-btn color="grey" @click="toogleFiltersVisibility()">
+                <v-icon left>mdi-filter</v-icon>
+                <span v-if="showFilters">Ocultar filtros</span>
+                <span v-else>Mostrar filtros</span>
+            </v-btn>
+            <v-btn v-if="tableMultiSort" :disabled="!isSorted" color="secondary" @click="clearSorts()">
+                <v-icon left>mdi-sort-variant-remove</v-icon>
+                Quitar orden
+            </v-btn>
+            <v-advanced-edit-dialog :return-value.sync="tableHeaders" title="Personalizar campos" scrollable max-width="800">
+                <v-advanced-data-table-headers v-model="tableHeaders"></v-advanced-data-table-headers>
+
+                <template #activator="{ attrs, on }">
+          <v-btn class="my-0 mx-2" v-bind="attrs" color="primary" v-on="on">
+            <v-icon left>mdi-format-columns</v-icon>
+            Personalizar campos
+          </v-btn>
+        </template>
+            </v-advanced-edit-dialog>
+        </v-card-actions>
+        <v-card-text>
+            <slot name="filters" v-if="showFilters"></slot>
+            <v-data-table v-model="selected" v-bind="$attrs" :items="items" :headers="visibleHeaders" :sort-by.sync="tableSortBy" :sort-desc.sync="tableSortDesc" :multi-sort="tableMultiSort" @input="input($event)">
+
+                <template v-for="(index, name) in $scopedSlots" #[name]="scope">
+          <slot :name="name" v-bind="scope"></slot>
+        </template>
+            </v-data-table>
+        </v-card-text>
+    </v-card>
+</section>

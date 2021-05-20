@@ -1,0 +1,104 @@
+<section class="user-menu">
+  
+  <v-btn v-if="!open" color="black" dark fixed bottom right fab @click="showMenu">
+    <v-icon>menu</v-icon>
+  </v-btn>
+  
+  <v-navigation-drawer 
+    v-model="open"
+    app
+    permanent
+    right
+    expand-on-hover
+    class="user-menu app--drawer">
+    
+    <div class="open-menu">
+      <v-list
+        dense
+        nav
+        class="user-menu-item-list">
+
+        <v-list-item two-line>
+
+          <v-list-item-icon>
+            <v-icon>mdi-cog</v-icon>
+          </v-list-item-icon>
+          
+          <v-list-item-content>
+
+            <v-list-item-title>Ajustes</v-list-item-title>
+
+            <v-switch
+              color="white"
+              off-icon="mdi-white-balance-sunny"
+              on-icon="mdi-weather-night"
+              prepend-icon="mdi-weather-night"
+              v-model="$vuetify.theme.dark"
+              label="Tema oscuro"></v-switch>
+
+          </v-list-item-content>
+                  
+        </v-list-item>
+
+        <v-divider></v-divider>
+
+        <div v-for="item in items" :key="item.id">
+          
+          <template v-if="item.children && item.children.length > 0">
+            
+            <v-list-group>
+              
+              <template v-slot:activator>
+                <v-list-item>
+
+                  <v-list-item-icon>
+                    <v-icon>{{ item.icon }}</v-icon>
+                  </v-list-item-icon>
+        
+                  <v-list-item-content>
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  </v-list-item-content>
+                          
+                </v-list-item>
+              </template>
+              
+              <v-list-item class="child" v-for="children in item.children" :key="children.id" :to="children.path" link>
+                <v-list-item-icon>
+                  <v-icon>{{ children.icon }}</v-icon>
+                </v-list-item-icon>
+        
+                <v-list-item-content>
+                  <v-list-item-title>{{ children.title }}</v-list-item-title>
+                </v-list-item-content>
+                
+              </v-list-item>
+
+            </v-list-group>
+
+            <v-divider></v-divider>
+
+          </template>
+
+          <template  v-else-if="item.path">
+            
+            <v-list-item class="link" :to="item.path" link>
+              <v-list-item-icon>
+                <v-icon>{{ item.icon }}</v-icon>
+              </v-list-item-icon>
+      
+              <v-list-item-content>
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+              </v-list-item-content>
+              
+            </v-list-item>
+            
+            <v-divider></v-divider>
+         
+          </template>
+          
+        </div>
+      </v-list>
+    </div>
+
+  </v-navigation-drawer>
+</section>
