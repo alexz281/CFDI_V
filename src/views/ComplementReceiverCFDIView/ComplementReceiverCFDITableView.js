@@ -1,4 +1,4 @@
-import cfdiservices from "@/services/issuedcfdi";
+import cfdiservices from "@/services/complementReciep";
 import {
     dateFormatOptions,
     dateStringToLocaleString,
@@ -18,7 +18,9 @@ export default {
         pagination: {},
         cfdiFilterChoosed: null,
         cfditype: ["", "Ingresos", "Egresos"],
+        payment_method: ["", "PUE", "PPD"],
         companyFilterChoosed: null,
+        paymentmethodFilterChoosed: null,
         company: [
             "",
             "CEL",
@@ -44,96 +46,86 @@ export default {
             "URU",
         ],
         headers: [{
-                text: "Compañia",
+                text: "Compañía",
                 value: "company",
             },
             {
-                text: "Status",
-                value: "status",
+                text: "UUID de Pago",
+                value: "uuid_pay",
+                width: 300
             },
             {
-                text: "Fecha de Cancelación",
-                value: "cancellation_datetime",
+                text: "Fecha Pago (ERP)",
+                value: "transdate",
             },
             {
-                text: "Version",
-                value: "version",
+                text: "Fecha CFDI de Pago",
+                value: "payment_date_time",
+            },
+            {
+                text: "Serie Folio",
+                value: "folio",
+            },
+            {
+                text: "UUID Factura",
+                value: "uuid_invoice",
+                width: 350
+            },
+            {
+                text: "Emisión factura",
+                value: "cfdidatetime",
+            },
+            {
+                text: "RFC",
+                value: "issuer_rfc",
+            },
+            {
+                text: "Descripción",
+                value: "desc_vend",
+                width: 450
+            },
+            {
+                text: "Método de Pago",
+                value: "paymentmethod",
+            },
+            {
+                text: "Monto del Pago (Complemento)",
+                value: "pay_amount",
+            },
+            {
+                text: "Moneda",
+                value: "currency_invoice",
             },
             {
                 text: "Tipo de CFDI",
                 value: "cfditype",
             },
             {
-                text: "CFDI",
-                value: "uuid",
-                width: 300
-            },
-            {
-                text: "Serie",
-                value: "series",
-            },
-            {
-                text: "Folio",
-                value: "folio",
-            },
-            {
-                text: "Emision",
-                value: "cfdidatetime",
-            },
-            {
-                text: "Receptor",
-                value: "receiver_rfc",
-            },
-            {
-                text: "Descripción del Receptor",
-                value: "receiver_name",
-            },
-            {
-                text: "Emisor",
-                value: "issuer_rfc",
-            },
-            {
-                text: "Descripción del Emisor",
-                value: "issuer_name",
-            },
-            {
-                text: "Descripcion",
-                value: "descripcion",
-            },
-            {
-                text: "Metodo de Pago",
-                value: "payment_method",
-            },
-            {
-                text: "Forma de Pago",
-                value: "payment_mode",
-            },
-            {
-                text: "SubTotal",
+                text: "SubtTotal",
                 value: "subtotal",
+            },
+            {
+                text: "IVA",
+                value: "taxes_invoice",
             },
             {
                 text: "Descuento",
                 value: "discount_total_amount",
             },
             {
-                text: "Impuestos",
-                value: "taxes",
-            },
-            {
-                text: "IVA Retenido",
-                value: "iva_retenido",
-            },
-            {
                 text: "Total",
                 value: "total",
             },
+            {
+                text: "Saldo Insoluto",
+                value: "outstanding_balance",
+            },
         ],
-        cfdireport: [],
+        complement: [],
         totalElements: 0,
     }),
     created() {
-        this.getcfidireport();
+        this.getcfdireporcomplemnt();
     },
     mounted() {
         console.log(this.pagination);
@@ -143,16 +135,21 @@ export default {
             let time = new Date(milliSecond);
             return time.toLocaleDateString();
         },
+        formaterCurrency(currency) {
+            let val = (currency / 1).toFixed(2).replace(',', '.')
+            return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        },
         exportToExcel() {
-            var issued = XLSX.utils.json_to_sheet(this.cfdireport);
+            var issued = XLSX.utils.json_to_sheet(this.complement);
             var wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, issued, "Issued");
             XLSX.writeFile(wb, "Issued.xlsx");
         },
-        async getcfidireport() {
+        async getcfdireporcomplemnt() {
             const companygroup = "Inmobiliaria";
             let cfditype;
             let company;
+            let paymentmethod;
             let datestart;
             let dateend;
             let page = this.pagination.page ? this.pagination.page - 1 : 0;
@@ -172,6 +169,11 @@ export default {
             } else {
                 cfditype = this.cfdiFilterChoosed == "" ? null : this.cfdiFilterChoosed;
             }
+            if (this.paymentmethodFilterChoosed == null) {
+                paymentmethod = null;
+            } else {
+                paymentmethod = this.paymentmethodFilterChoosed == "" ? null : this.paymentmethodFilterChoosed;
+            }
             //var today = new Date();
             if (
                 this.daterange == "" ||
@@ -189,10 +191,11 @@ export default {
                 dateend = dateend + " " + this.end;
             }
 
-            let res = await cfdiservices.getcfdireporissues(
+            let res = await cfdiservices.getcfdireporcomplemnt(
                 companygroup,
                 company,
                 cfditype,
+                paymentmethod,
                 datestart,
                 dateend,
                 size,
@@ -200,54 +203,42 @@ export default {
             );
             if (res && res.content) {
                 let cfdiresponse = res.content;
-                this.cfdireport = cfdiresponse.map((report) => {
+                this.complement = cfdiresponse.map((report) => {
                     return {
                         company: report.company,
-                        status: report.status,
-                        cancellation_datetime: this.milliSecondToDate(
-                            report.cancellation_datetime
-                        ),
-                        version: report.version,
-                        cfditype: report.cfditype,
-                        uuid: report.uuid,
-                        series: report.series,
+                        uuid_pay: report.uuid_pay,
+                        transdate: this.milliSecondToDate(report.transdate),
+                        payment_date_time: this.milliSecondToDate(report.payment_date_time),
                         folio: report.folio,
+                        uuid_invoice: report.uuid_invoice,
                         cfdidatetime: this.milliSecondToDate(report.cfdidatetime),
-                        receiver_rfc: report.receiver_rfc,
-                        receiver_name: report.receiver_name,
                         issuer_rfc: report.issuer_rfc,
-                        issuer_name: report.issuer_name,
-                        descripcion: report.descripcion,
-                        payment_method: report.payment_method,
-                        payment_mode: report.payment_mode,
-                        complement: report.complement,
-                        discount_total_amount: report.discount_total_amount,
-                        subtotal: report.subtotal,
-                        taxes: report.taxes,
-                        isr: report.isr,
-                        iva: report.iva,
-                        ieps: report.ieps,
-                        iva_retenido: report.iva_retenido,
-                        isr_retenido: report.isr_retenido,
-                        transferred_taxes_total_amount: report.transferred_taxes_total_amount,
-                        withheld_taxes_total_amount: report.withheld_taxes_total_amount,
-                        total: report.total,
+                        desc_vend: report.desc_vend,
+                        paymentmethod: report.paymentmethod,
+                        pay_amount: report.pay_amount,
+                        currency_invoice: report.currency_invoice,
+                        cfditype: report.cfditype,
+                        subtotal: this.formaterCurrency(report.subtotal),
+                        taxes_invoice: this.formaterCurrency(report.taxes_invoice),
+                        discount_total_amount: this.formaterCurrency(report.discount_total_amount),
+                        total: this.formaterCurrency(report.total),
+                        outstanding_balance: this.formaterCurrency(report.outstanding_balance),
                     };
                 });
             }
-            console.log(this.cfdireport);
+            console.log(this.complement);
             if (res && res.content) {
                 this.totalElements = res.totalElements;
             }
         },
         onFilterSelected() {
-            this.getcfidireport();
+            this.getcfdireporcomplemnt();
         },
     },
     watch: {
         pagination: {
             handler: function() {
-                this.getcfidireport();
+                this.getcfdireporcomplemnt();
             },
             deep: true,
         },

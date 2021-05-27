@@ -1,0 +1,57 @@
+<v-entity-table :can-create-items="false" :can-view-items="false" :can-edit-items="false" :can-refresh-items="false" :can-delete-items="false" :headers="headers" :items="complement" :options.sync="pagination" :server-items-length="totalElements">
+    <template #filters>
+    <v-container>
+      <v-layout row wrap>
+        <v-flex xs12 md2>
+          <div class="give-space-field-right">
+            <v-select
+              v-model="companyFilterChoosed"
+              :items="company"
+              label="Escoge un filtro"
+              @change="onFilterSelected"
+            ></v-select>
+          </div>
+        </v-flex>
+        <v-flex xs18 md4>
+          <div>
+            <v-advanced-edit-dialog
+              :return-value.sync="range"
+              title="Seleccionar Fecha"
+              scrollable
+              max-width="300"
+            >
+              <v-date-picker v-model="range" lang="en" range></v-date-picker>
+              <template #activator="{ attrs, on }">
+                <v-text-field
+                  v-bind="attrs"
+                  v-on="on"
+                  readonly
+                  v-model="daterange"
+                  @input="onFilterSelected"
+                >
+                </v-text-field>
+              </template>
+    </v-advanced-edit-dialog>
+    </div>
+    </v-flex>
+    <v-flex xs12 md2>
+        <div class="give-space-field-left">
+            <v-select v-model="cfdiFilterChoosed" :items="cfditype" label="Escoge un filtro" @change="onFilterSelected">
+            </v-select>
+        </div>
+    </v-flex>
+    <v-flex xs12 md2>
+        <div class="give-space-field-left">
+            <v-select v-model="paymentmethodFilterChoosed" :items="payment_method" label="Escoge un filtro" @change="onFilterSelected">
+            </v-select>
+        </div>
+    </v-flex>
+    </v-layout>
+    </v-container>
+    </template>
+    <template #extra-actions>
+        <v-btn @click="exportToExcel">
+          Excel download
+        </v-btn>
+      </template>
+</v-entity-table>

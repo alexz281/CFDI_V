@@ -1,4 +1,4 @@
-import cfdiservices from "@/services/issuedcfdi";
+import cfdiservicesrecip from "@/services/recipcfdi";
 import {
     dateFormatOptions,
     dateStringToLocaleString,
@@ -109,6 +109,14 @@ export default {
                 value: "payment_mode",
             },
             {
+                text: "Complemento",
+                value: "complement",
+            },
+            {
+                text: "CDFI de Referencia",
+                value: "referenced_cfdi_uuid",
+            },
+            {
                 text: "SubTotal",
                 value: "subtotal",
             },
@@ -117,19 +125,39 @@ export default {
                 value: "discount_total_amount",
             },
             {
-                text: "Impuestos",
-                value: "taxes",
+                text: "ISR",
+                value: "isr",
+            },
+            {
+                text: "IVA",
+                value: "iva",
+            },
+            {
+                text: "IEPS",
+                value: "ieps",
             },
             {
                 text: "IVA Retenido",
                 value: "iva_retenido",
             },
             {
+                text: "ISR Retenido",
+                value: "isr_retenido",
+            },
+            {
+                text: "Impuesto Local",
+                value: "iva_local",
+            },
+            {
+                text: "Retencion Local",
+                value: "isr_local",
+            },
+            {
                 text: "Total",
                 value: "total",
             },
         ],
-        cfdireport: [],
+        cfdireportrecip: [],
         totalElements: 0,
     }),
     created() {
@@ -144,10 +172,10 @@ export default {
             return time.toLocaleDateString();
         },
         exportToExcel() {
-            var issued = XLSX.utils.json_to_sheet(this.cfdireport);
+            var recip = XLSX.utils.json_to_sheet(this.cfdireportrecip);
             var wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, issued, "Issued");
-            XLSX.writeFile(wb, "Issued.xlsx");
+            XLSX.utils.book_append_sheet(wb, recip, "Recip");
+            XLSX.writeFile(wb, "Recip.xlsx");
         },
         async getcfidireport() {
             const companygroup = "Inmobiliaria";
@@ -189,7 +217,7 @@ export default {
                 dateend = dateend + " " + this.end;
             }
 
-            let res = await cfdiservices.getcfdireporissues(
+            let res = await cfdiservicesrecip.getcfdireporrecip(
                 companygroup,
                 company,
                 cfditype,
@@ -200,7 +228,7 @@ export default {
             );
             if (res && res.content) {
                 let cfdiresponse = res.content;
-                this.cfdireport = cfdiresponse.map((report) => {
+                this.cfdireportrecip = cfdiresponse.map((report) => {
                     return {
                         company: report.company,
                         status: report.status,
@@ -235,7 +263,7 @@ export default {
                     };
                 });
             }
-            console.log(this.cfdireport);
+            console.log(this.cfdireportrecip);
             if (res && res.content) {
                 this.totalElements = res.totalElements;
             }
